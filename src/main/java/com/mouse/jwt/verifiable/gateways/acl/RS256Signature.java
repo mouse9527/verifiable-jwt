@@ -13,12 +13,12 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-public class RSASignature implements com.mouse.jwt.verifiable.domain.Signature {
+public class RS256Signature implements com.mouse.jwt.verifiable.domain.Signature {
     private final Signature signature = Signature.getInstance("SHA1withRSA");
     private final PrivateKey privateKey;
     private final PublicKey publicKey;
 
-    public RSASignature(KeyPariProperties keyPariProperties) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public RS256Signature(KeyPariProperties keyPariProperties) throws NoSuchAlgorithmException, InvalidKeySpecException {
         KeyFactory factory = KeyFactory.getInstance("RSA");
         KeySpec privateKeySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(keyPariProperties.getPrivateKey()));
         privateKey = factory.generatePrivate(privateKeySpec);

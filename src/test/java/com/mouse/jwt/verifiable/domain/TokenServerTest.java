@@ -1,7 +1,7 @@
 package com.mouse.jwt.verifiable.domain;
 
 import com.jayway.jsonpath.JsonPath;
-import com.mouse.jwt.verifiable.gateways.acl.RSASignature;
+import com.mouse.jwt.verifiable.gateways.acl.RS256Signature;
 import com.mouse.jwt.verifiable.gateways.acl.VerifiableJWTServer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,9 +19,9 @@ public class TokenServerTest {
     private JWTServer<TestPayload> jwtServer;
 
     @BeforeEach
-    void setUp() throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException {
+    void setUp() throws NoSuchAlgorithmException, InvalidKeySpecException {
         KeyPariProperties keyPari = new MockKeyPairProperties();
-        Signature signature = new RSASignature(keyPari);
+        Signature signature = new RS256Signature(keyPari);
         jwtServer = new VerifiableJWTServer<>(signature);
     }
 

@@ -1,5 +1,8 @@
 package com.mouse.jwt.verifiable.domain;
 
-public interface JWTServer<T> {
-    String sign(T payload);
+import java.security.InvalidKeyException;
+import java.security.SignatureException;
+
+public interface JWTServer<P extends Payload> {
+    Token<Header, Payload> sign(P payload) throws SignatureException, InvalidKeyException;
 }

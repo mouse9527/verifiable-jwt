@@ -41,6 +41,16 @@ public class TokenServerTest {
         assertThat(JsonPath.compile("$.exp").<String>read(payload)).isNotEmpty();
     }
 
+    @Test
+    void shouldBeAbleToVerifiableJWT() throws SignatureException, InvalidKeyException {
+        TestPayload payload = new TestPayload();
+        Token<Header, Payload> token = jwtServer.sign(payload);
+
+        String jwtToken = token.toString();
+        assertThat(jwtServer.verify(jwtToken)).isTrue();
+        assertThat(jwtServer.verify(jwtToken.replace("A", "B"))).isFalse();
+    }
+
     private static class TestPayload implements Payload {
         @Override
         public String getId() {

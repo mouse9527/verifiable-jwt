@@ -18,7 +18,7 @@ public class RSASignature implements com.mouse.jwt.verifiable.domain.Signature {
     private final PrivateKey privateKey;
     private final PublicKey publicKey;
 
-    public RSASignature(KeyPariProperties keyPariProperties) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException {
+    public RSASignature(KeyPariProperties keyPariProperties) throws NoSuchAlgorithmException, InvalidKeySpecException {
         KeyFactory factory = KeyFactory.getInstance("RSA");
         KeySpec privateKeySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(keyPariProperties.getPrivateKey()));
         privateKey = factory.generatePrivate(privateKeySpec);
@@ -35,7 +35,10 @@ public class RSASignature implements com.mouse.jwt.verifiable.domain.Signature {
     }
 
     @Override
-    public boolean verify(String rawString, String jwtToken) {
-        return false;
+    public boolean verify(String jwtToken) throws InvalidKeyException, SignatureException {
+        String[] split = jwtToken.split("\\.");
+        this.signature.initVerify(publicKey);
+        this.signature.update(String.format("%s.%s", split[0], split[1]).getBytes(StandardCharsets.UTF_8));
+        return this.signature.verify(Base64.getDecoder().decode(split[2]));
     }
 }

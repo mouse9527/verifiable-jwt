@@ -19,4 +19,9 @@ public class VerifiableJWTServer<P extends Payload> implements JWTServer<P> {
         signature.sign(token);
         return token;
     }
+
+    @Override
+    public boolean verify(String tokenString) throws SignatureException, InvalidKeyException {
+        return signature.verify(tokenString);
+    }
 }

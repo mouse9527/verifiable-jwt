@@ -5,6 +5,7 @@ import com.mouse.jwt.verifiable.gateways.acl.DefaultJWTSignature;
 import com.mouse.jwt.verifiable.gateways.acl.DefaultPayload;
 import com.mouse.jwt.verifiable.gateways.acl.DefaultSerializer;
 import com.mouse.jwt.verifiable.gateways.acl.VerifiableJWTServer;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,10 +25,14 @@ public class TokenServerTest {
     private JWTServer jwtServer;
     private DefaultPayload raw;
 
+    @BeforeAll
+    static void beforeAll() {
+        Serializer.resetSerializer(new DefaultSerializer());
+    }
+
     @BeforeEach
     void setUp() throws InvalidKeyException, NoSuchAlgorithmException {
         jwtServer = new VerifiableJWTServer(createSignature());
-        Serializer.resetSerializer(new DefaultSerializer());
         raw = new DefaultPayload("mock-token-id", "user", IAT, EXP);
     }
 

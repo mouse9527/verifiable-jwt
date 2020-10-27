@@ -8,6 +8,9 @@ public abstract class Serializer {
     }
 
     public static Serializer getInstance() {
+        if (instance == null) {
+            throw new RuntimeException("Serializer not initialized");
+        }
         return instance;
     }
 

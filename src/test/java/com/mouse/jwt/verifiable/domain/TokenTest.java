@@ -3,6 +3,7 @@ package com.mouse.jwt.verifiable.domain;
 import com.mouse.jwt.verifiable.gateways.acl.DefaultHeader;
 import com.mouse.jwt.verifiable.gateways.acl.DefaultPayload;
 import com.mouse.jwt.verifiable.gateways.acl.DefaultSerializer;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -20,10 +21,13 @@ class TokenTest {
         return Stream.of(null, "", "xxx.xxx", "xxx.xx.xx.xx");
     }
 
+    @BeforeAll
+    static void beforeAll() {
+        Serializer.resetSerializer(new DefaultSerializer());
+    }
+
     @Test
     void shouldBeAbleToCreateWithJWTToken() {
-        Serializer.resetSerializer(new DefaultSerializer());
-
         Token token = new Token(JWT_TOKEN);
 
         assertThat(token.getPayload(DefaultPayload.class).getId()).isEqualTo("mock-token-id");

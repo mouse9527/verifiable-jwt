@@ -1,11 +1,13 @@
 package com.mouse.jwt.verifiable.domain;
 
+import java.time.Instant;
+
 public interface Payload {
     String getId();
 
     String getType();
 
-    String getIat();
+    Instant getIat();
 
-    String getExp();
+    Instant getExp();
 }

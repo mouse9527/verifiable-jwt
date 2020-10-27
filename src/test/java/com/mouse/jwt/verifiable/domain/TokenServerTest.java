@@ -1,12 +1,14 @@
 package com.mouse.jwt.verifiable.domain;
 
 import com.jayway.jsonpath.JsonPath;
+import com.mouse.jwt.verifiable.gateways.acl.DefaultPayload;
 import com.mouse.jwt.verifiable.gateways.acl.DefaultSignature;
 import com.mouse.jwt.verifiable.gateways.acl.VerifiableJWTServer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.security.*;
+import java.time.Instant;
 import java.util.Base64;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,7 +30,7 @@ public class TokenServerTest {
 
     @Test
     void shouldBeAbleToSignToJWT() throws SignatureException, InvalidKeyException {
-        TestPayload raw = new TestPayload();
+        DefaultPayload raw = new DefaultPayload("mock-token-id", "user", Instant.now(), Instant.now());
 
         Token token = jwtServer.sign(raw);
 
@@ -45,7 +47,7 @@ public class TokenServerTest {
 
     @Test
     void shouldBeAbleToVerifiableJWT() throws SignatureException, InvalidKeyException {
-        TestPayload payload = new TestPayload();
+        DefaultPayload payload = new DefaultPayload();
         Token token = jwtServer.sign(payload);
 
         String jwtToken = token.toString();

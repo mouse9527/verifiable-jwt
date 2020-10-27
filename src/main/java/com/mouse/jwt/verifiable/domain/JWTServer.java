@@ -1,7 +1,21 @@
 package com.mouse.jwt.verifiable.domain;
 
-public interface JWTServer {
-    Token sign(Payload payload);
+import com.mouse.jwt.verifiable.gateways.acl.DefaultHeader;
 
-    boolean verify(Token token);
+public class JWTServer {
+    private final JWTSignature JWTSignature;
+
+    public JWTServer(JWTSignature JWTSignature) {
+        this.JWTSignature = JWTSignature;
+    }
+
+    public Token sign(Payload payload) {
+        Token token = new Token(DefaultHeader.RS512, payload);
+        JWTSignature.sign(token);
+        return token;
+    }
+
+    public boolean verify(Token token) {
+        return JWTSignature.verify(token);
+    }
 }

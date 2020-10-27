@@ -3,7 +3,6 @@ package com.mouse.jwt.verifiable.domain;
 import com.jayway.jsonpath.JsonPath;
 import com.mouse.jwt.verifiable.gateways.acl.DefaultPayload;
 import com.mouse.jwt.verifiable.gateways.acl.DefaultSerializer;
-import com.mouse.jwt.verifiable.gateways.acl.VerifiableJWTServer;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,7 @@ public class TokenServerTest {
 
     @BeforeEach
     void setUp() throws InvalidKeyException, NoSuchAlgorithmException {
-        jwtServer = new VerifiableJWTServer(createSignature());
+        jwtServer = new JWTServer(createSignature());
         raw = new DefaultPayload("mock-token-id", "user", IAT, EXP);
     }
 

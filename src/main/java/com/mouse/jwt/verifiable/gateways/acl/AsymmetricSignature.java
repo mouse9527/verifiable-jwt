@@ -1,6 +1,7 @@
 package com.mouse.jwt.verifiable.gateways.acl;
 
 import com.mouse.jwt.verifiable.domain.JWTSignature;
+import com.mouse.jwt.verifiable.domain.Serializer;
 import com.mouse.jwt.verifiable.domain.Token;
 
 import javax.crypto.BadPaddingException;
@@ -22,7 +23,7 @@ public class AsymmetricSignature implements JWTSignature {
         signer = Cipher.getInstance(transformation);
         signer.init(Cipher.ENCRYPT_MODE, key);
         verifier = Cipher.getInstance(transformation);
-        verifier.init(Cipher.DECRYPT_MODE, key);
+        verifier.init(Cipher.ENCRYPT_MODE, key);
         digest = MessageDigest.getInstance("SHA-256");
     }
 
@@ -38,6 +39,12 @@ public class AsymmetricSignature implements JWTSignature {
 
     @Override
     public boolean verify(Token token) {
-        return false;
+        String signContent = token.getSignContent();
+        try {
+            byte[] digest = this.digest.digest(verifier.doFinal(signContent.getBytes(StandardCharsets.UTF_8)));
+            return Serializer.getInstance().base64Encode(digest).equals(token.getSignature());
+        } catch (IllegalBlockSizeException | BadPaddingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

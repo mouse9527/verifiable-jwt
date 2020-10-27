@@ -1,28 +1,28 @@
 package com.mouse.jwt.verifiable.gateways.acl;
 
-import com.mouse.jwt.verifiable.domain.Header;
-import com.mouse.jwt.verifiable.domain.Payload;
 import com.mouse.jwt.verifiable.domain.Token;
 
 import java.nio.charset.StandardCharsets;
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.util.Base64;
 
-public class SHA1withRSASignature implements com.mouse.jwt.verifiable.domain.Signature {
+public class DefaultSignature implements com.mouse.jwt.verifiable.domain.Signature {
     private final Signature signature;
     private final KeyPair keyPair;
 
-    public SHA1withRSASignature(KeyPair keyPair) throws NoSuchAlgorithmException {
+    public DefaultSignature(KeyPair keyPair, Signature signature) {
         this.keyPair = keyPair;
-        this.signature = Signature.getInstance("SHA1withRSA");
+        this.signature = signature;
     }
 
     @Override
-    public void sign(Token<Header, Payload> token) throws SignatureException, InvalidKeyException {
+    public void sign(Token token) throws SignatureException, InvalidKeyException {
         signature.initSign(keyPair.getPrivate());
         signature.update(token.getSignContent().getBytes(StandardCharsets.UTF_8));
-        byte[] signed = signature.sign();
-        token.sign(signed);
+        token.sign(signature.sign());
     }
 
     @Override

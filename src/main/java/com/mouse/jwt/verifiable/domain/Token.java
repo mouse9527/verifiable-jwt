@@ -8,7 +8,9 @@ import java.util.Base64;
 
 public class Token {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
+    private static final Base64.Decoder DECODER = Base64.getDecoder();
     private final ObjectMapper objectMapper = new ObjectMapper();
+
     private final String headerString;
     private final String payloadString;
     private Header header;
@@ -51,14 +53,14 @@ public class Token {
 
     public Payload getPayload(Class<? extends Payload> clazz) throws IOException {
         if (payload == null) {
-            payload = objectMapper.readValue(Base64.getDecoder().decode(payloadString), clazz);
+            payload = objectMapper.readValue(DECODER.decode(payloadString), clazz);
         }
         return payload;
     }
 
     public Header getHeader(Class<? extends Header> clazz) throws IOException {
         if (header == null) {
-            header = objectMapper.readValue(Base64.getDecoder().decode(headerString), clazz);
+            header = objectMapper.readValue(DECODER.decode(headerString), clazz);
         }
         return header;
     }

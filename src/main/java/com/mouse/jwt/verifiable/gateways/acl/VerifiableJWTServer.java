@@ -1,8 +1,8 @@
 package com.mouse.jwt.verifiable.gateways.acl;
 
 import com.mouse.jwt.verifiable.domain.JWTServer;
-import com.mouse.jwt.verifiable.domain.Payload;
 import com.mouse.jwt.verifiable.domain.JWTSignature;
+import com.mouse.jwt.verifiable.domain.Payload;
 import com.mouse.jwt.verifiable.domain.Token;
 
 public class VerifiableJWTServer implements JWTServer {

@@ -1,7 +1,6 @@
 package com.mouse.jwt.verifiable.domain;
 
 import com.jayway.jsonpath.JsonPath;
-import com.mouse.jwt.verifiable.gateways.acl.DefaultJWTSignature;
 import com.mouse.jwt.verifiable.gateways.acl.DefaultPayload;
 import com.mouse.jwt.verifiable.gateways.acl.DefaultSerializer;
 import com.mouse.jwt.verifiable.gateways.acl.VerifiableJWTServer;
@@ -36,11 +35,11 @@ public class TokenServerTest {
         raw = new DefaultPayload("mock-token-id", "user", IAT, EXP);
     }
 
-    private JWTSignature createSignature() throws NoSuchAlgorithmException, InvalidKeyException {
+    private com.mouse.jwt.verifiable.domain.JWTSignature createSignature() throws NoSuchAlgorithmException, InvalidKeyException {
         KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
         generator.initialize(2048);
         KeyPair keyPair = generator.genKeyPair();
-        return new DefaultJWTSignature(keyPair, "SHA1withRSA");
+        return new JWTSignature(keyPair, "SHA1withRSA");
     }
 
     @Test

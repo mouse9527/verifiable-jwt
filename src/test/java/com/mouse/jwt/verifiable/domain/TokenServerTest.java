@@ -10,8 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.security.*;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,15 +60,54 @@ public class TokenServerTest {
         assertThat(jwtServer.verify(new Token(jwtToken.replace("A", "B")))).isFalse();
     }
 
+    @Test
+    @SuppressWarnings("deprecation")
+    void performanceTest() throws InterruptedException {
+        List<Token> tokens = Collections.synchronizedList(new ArrayList<>());
+        Thread thread = new Thread(() -> {
+            int num = 0;
+            while (true) {
+                num++;
+                try {
+                    Token token = jwtServer.sign(new DefaultPayload(String.valueOf(num), String.valueOf(num), IAT, EXP));
+                    tokens.add(token);
+                } catch (SignatureException | InvalidKeyException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+        Thread.sleep(10000);
+        thread.stop();
+
+        List<Token> verified = Collections.synchronizedList(new ArrayList<>());
+        Thread verify = new Thread(() -> {
+            for (Token token : tokens) {
+                try {
+                    jwtServer.verify(token);
+                    verified.add(token);
+                } catch (SignatureException | InvalidKeyException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+        verify.start();
+        Thread.sleep(200);
+        verify.stop();
+
+        System.out.printf("Sign: %s per/sec%nVerify: %s per/sec%n", tokens.size() / 10, verified.size() * 5);
+    }
 
     @Test
     void shouldBeAbleToAsyncSign() throws InterruptedException, SignatureException, InvalidKeyException {
         Map<Payload, Token> tokens = new ConcurrentHashMap<>();
         for (int i = 0; i < 100; i++) {
-            new Thread(new Job(new DefaultPayload(String.valueOf(i), String.valueOf(i), IAT, EXP), tokens)).start();
+            DefaultPayload payload = new DefaultPayload(String.valueOf(i), String.valueOf(i), IAT, EXP);
+            new Thread(new Job(payload, tokens)).start();
         }
-
         Thread.sleep(2000);
+
         for (Token token : tokens.values()) {
             assertThat(jwtServer.verify(token)).isTrue();
         }

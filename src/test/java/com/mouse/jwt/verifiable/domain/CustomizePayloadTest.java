@@ -19,7 +19,7 @@ public class CustomizePayloadTest {
         Serializer.resetSerializer(new DefaultSerializer());
 
         KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-        generator.initialize(1024);
+        generator.initialize(2048);
         JWTServer jwtServer = new JWTServer(new SymmetricSignature(generator.genKeyPair(), "SHA1withRSA"));
 
         CustomizePayload payload = new CustomizePayload();

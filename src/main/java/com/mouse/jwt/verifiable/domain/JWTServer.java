@@ -6,5 +6,5 @@ import java.security.SignatureException;
 public interface JWTServer {
     Token sign(Payload payload) throws SignatureException, InvalidKeyException;
 
-    boolean verify(String tokenString) throws SignatureException, InvalidKeyException;
+    boolean verify(Token token) throws SignatureException, InvalidKeyException;
 }

@@ -9,7 +9,6 @@ import java.security.InvalidKeyException;
 import java.security.SignatureException;
 
 public class VerifiableJWTServer implements JWTServer {
-
     private final Signature signature;
 
     public VerifiableJWTServer(Signature signature) {
@@ -24,8 +23,7 @@ public class VerifiableJWTServer implements JWTServer {
     }
 
     @Override
-    public boolean verify(String tokenString) throws SignatureException, InvalidKeyException {
-        Token token = new Token(tokenString);
+    public boolean verify(Token token) throws SignatureException, InvalidKeyException {
         return signature.verify(token);
     }
 }

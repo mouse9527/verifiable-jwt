@@ -15,15 +15,15 @@ public class TokenServerTest {
     private JWTServer jwtServer;
 
     @BeforeEach
-    void setUp() throws NoSuchAlgorithmException {
+    void setUp() throws InvalidKeyException, NoSuchAlgorithmException {
         jwtServer = new VerifiableJWTServer(createSignature());
     }
 
-    private Signature createSignature() throws NoSuchAlgorithmException {
+    private Signature createSignature() throws NoSuchAlgorithmException, InvalidKeyException {
         KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
         generator.initialize(2048);
         KeyPair keyPair = generator.genKeyPair();
-        return new DefaultSignature(keyPair, java.security.Signature.getInstance("SHA1withRSA"));
+        return new DefaultSignature(keyPair, "SHA1withRSA");
     }
 
     @Test
@@ -49,8 +49,8 @@ public class TokenServerTest {
         Token token = jwtServer.sign(payload);
 
         String jwtToken = token.toString();
-        assertThat(jwtServer.verify(jwtToken)).isTrue();
-        assertThat(jwtServer.verify(jwtToken.replace("A", "B"))).isFalse();
+        assertThat(jwtServer.verify(new Token(jwtToken))).isTrue();
+        assertThat(jwtServer.verify(new Token(jwtToken.replace("A", "B")))).isFalse();
     }
 
 }

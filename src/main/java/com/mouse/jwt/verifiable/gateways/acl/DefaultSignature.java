@@ -3,32 +3,29 @@ package com.mouse.jwt.verifiable.gateways.acl;
 import com.mouse.jwt.verifiable.domain.Token;
 
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.KeyPair;
-import java.security.Signature;
-import java.security.SignatureException;
+import java.security.*;
 import java.util.Base64;
 
 public class DefaultSignature implements com.mouse.jwt.verifiable.domain.Signature {
-    private final Signature signature;
-    private final KeyPair keyPair;
+    private final Signature signer;
+    private final Signature verifier;
 
-    public DefaultSignature(KeyPair keyPair, Signature signature) {
-        this.keyPair = keyPair;
-        this.signature = signature;
+    public DefaultSignature(KeyPair keyPair, String algorithm) throws InvalidKeyException, NoSuchAlgorithmException {
+        signer = Signature.getInstance(algorithm);
+        signer.initSign(keyPair.getPrivate());
+        verifier = Signature.getInstance(algorithm);
+        verifier.initVerify(keyPair.getPublic());
     }
 
     @Override
-    public void sign(Token token) throws SignatureException, InvalidKeyException {
-        signature.initSign(keyPair.getPrivate());
-        signature.update(token.getSignContent().getBytes(StandardCharsets.UTF_8));
-        token.sign(signature.sign());
+    public void sign(Token token) throws SignatureException {
+        signer.update(token.getSignContent().getBytes(StandardCharsets.UTF_8));
+        token.sign(signer.sign());
     }
 
     @Override
-    public boolean verify(Token token) throws InvalidKeyException, SignatureException {
-        signature.initVerify(keyPair.getPublic());
-        signature.update(token.getSignContent().getBytes(StandardCharsets.UTF_8));
-        return signature.verify(Base64.getDecoder().decode(token.getSignature()));
+    public boolean verify(Token token) throws SignatureException {
+        verifier.update(token.getSignContent().getBytes(StandardCharsets.UTF_8));
+        return verifier.verify(Base64.getDecoder().decode(token.getSignature()));
     }
 }

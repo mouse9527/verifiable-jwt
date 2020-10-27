@@ -30,7 +30,7 @@ public class TokenServerTest {
 
     @Test
     void shouldBeAbleToSignToJWT() throws SignatureException, InvalidKeyException {
-        DefaultPayload raw = new DefaultPayload("mock-token-id", "user", Instant.now(), Instant.now());
+        DefaultPayload raw = new DefaultPayload("mock-token-id", "user", Instant.parse("2020-10-27T00:00:00Z"), Instant.parse("2020-10-28T00:00:00Z"));
 
         Token token = jwtServer.sign(raw);
 
@@ -41,8 +41,8 @@ public class TokenServerTest {
         String payload = new String(Base64.getDecoder().decode(jwtToken.split("\\.")[1]));
         assertThat(JsonPath.compile("$.id").<String>read(payload)).isEqualTo("mock-token-id");
         assertThat(JsonPath.compile("$.type").<String>read(payload)).isEqualTo("user");
-        assertThat(JsonPath.compile("$.iat").<String>read(payload)).isNotEmpty();
-        assertThat(JsonPath.compile("$.exp").<String>read(payload)).isNotEmpty();
+        assertThat(JsonPath.compile("$.iat").<String>read(payload)).isEqualTo("2020-10-27T00:00:00Z");
+        assertThat(JsonPath.compile("$.exp").<String>read(payload)).isEqualTo("2020-10-28T00:00:00Z");
     }
 
     @Test

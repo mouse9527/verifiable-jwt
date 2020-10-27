@@ -2,6 +2,7 @@ package com.mouse.jwt.verifiable.domain;
 
 import com.jayway.jsonpath.JsonPath;
 import com.mouse.jwt.verifiable.gateways.acl.DefaultPayload;
+import com.mouse.jwt.verifiable.gateways.acl.DefaultSerializer;
 import com.mouse.jwt.verifiable.gateways.acl.DefaultSignature;
 import com.mouse.jwt.verifiable.gateways.acl.VerifiableJWTServer;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,7 @@ public class TokenServerTest {
     @BeforeEach
     void setUp() throws InvalidKeyException, NoSuchAlgorithmException {
         jwtServer = new VerifiableJWTServer(createSignature());
+        Serializer.resetSerializer(new DefaultSerializer());
     }
 
     private Signature createSignature() throws NoSuchAlgorithmException, InvalidKeyException {

@@ -1,25 +1,6 @@
 package com.mouse.jwt.verifiable.domain;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
-import java.io.IOException;
-import java.util.Base64;
-
 public class Token {
-    private static final Base64.Encoder ENCODER;
-    private static final Base64.Decoder DECODER;
-    private static final ObjectMapper OBJECT_MAPPER;
-
-    static {
-        ENCODER = Base64.getEncoder();
-        DECODER = Base64.getDecoder();
-        OBJECT_MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
-        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-    }
-
     private final String headerString;
     private final String payloadString;
     private Header header;
@@ -41,15 +22,11 @@ public class Token {
     }
 
     public void sign(byte[] signature) {
-        this.signature = ENCODER.encodeToString(signature);
+        this.signature = Serializer.getInstance().base64Encode(signature);
     }
 
     private String toBase64String(Object obj) {
-        try {
-            return ENCODER.encodeToString(OBJECT_MAPPER.writeValueAsBytes(obj));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return Serializer.getInstance().writeValueToBase64(obj);
     }
 
     public String toString() {
@@ -60,16 +37,16 @@ public class Token {
         return String.format("%s.%s", headerString, payloadString);
     }
 
-    public Payload getPayload(Class<? extends Payload> clazz) throws IOException {
+    public Payload getPayload(Class<? extends Payload> clazz) {
         if (payload == null) {
-            payload = OBJECT_MAPPER.readValue(DECODER.decode(payloadString), clazz);
+            payload = Serializer.getInstance().readValueFromBase64(payloadString, clazz);
         }
         return payload;
     }
 
-    public Header getHeader(Class<? extends Header> clazz) throws IOException {
+    public Header getHeader(Class<? extends Header> clazz) {
         if (header == null) {
-            header = OBJECT_MAPPER.readValue(DECODER.decode(headerString), clazz);
+            header = Serializer.getInstance().readValueFromBase64(headerString, clazz);
         }
         return header;
     }

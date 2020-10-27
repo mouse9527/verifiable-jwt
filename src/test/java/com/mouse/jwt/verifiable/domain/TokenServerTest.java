@@ -3,6 +3,7 @@ package com.mouse.jwt.verifiable.domain;
 import com.jayway.jsonpath.JsonPath;
 import com.mouse.jwt.verifiable.gateways.acl.DefaultPayload;
 import com.mouse.jwt.verifiable.gateways.acl.DefaultSerializer;
+import com.mouse.jwt.verifiable.gateways.acl.SymmetricSignature;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,11 +35,11 @@ public class TokenServerTest {
         raw = new DefaultPayload("mock-token-id", "user", IAT, EXP);
     }
 
-    private com.mouse.jwt.verifiable.domain.JWTSignature createSignature() throws NoSuchAlgorithmException, InvalidKeyException {
+    private JWTSignature createSignature() throws NoSuchAlgorithmException, InvalidKeyException {
         KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-        generator.initialize(2048);
+        generator.initialize(1024);
         KeyPair keyPair = generator.genKeyPair();
-        return new JWTSignature(keyPair, "SHA1withRSA");
+        return new SymmetricSignature(keyPair, "SHA1withRSA");
     }
 
     @Test

@@ -2,6 +2,7 @@ package com.mouse.jwt.verifiable.domain;
 
 import com.jayway.jsonpath.JsonPath;
 import com.mouse.jwt.verifiable.gateways.acl.DefaultSerializer;
+import com.mouse.jwt.verifiable.gateways.acl.SymmetricSignature;
 import org.junit.jupiter.api.Test;
 
 import java.security.InvalidKeyException;
@@ -19,7 +20,7 @@ public class CustomizePayloadTest {
 
         KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
         generator.initialize(1024);
-        JWTServer jwtServer = new JWTServer(new JWTSignature(generator.genKeyPair(), "SHA1withRSA"));
+        JWTServer jwtServer = new JWTServer(new SymmetricSignature(generator.genKeyPair(), "SHA1withRSA"));
 
         CustomizePayload payload = new CustomizePayload();
         payload.admin = true;

@@ -3,7 +3,7 @@ package com.mouse.jwt.verifiable.domain;
 public abstract class Serializer {
     private static Serializer instance;
 
-    static void resetSerializer(Serializer serializer) {
+    public static void resetSerializer(Serializer serializer) {
         Serializer.instance = serializer;
     }
 

@@ -1,10 +1,10 @@
 package com.mouse.jwt.verifiable.gateways.acl;
 
+import com.mouse.jwt.verifiable.domain.Serializer;
 import com.mouse.jwt.verifiable.domain.Token;
 
 import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.util.Base64;
 
 public class DefaultSignature implements com.mouse.jwt.verifiable.domain.Signature {
     private final Signature signer;
@@ -26,6 +26,6 @@ public class DefaultSignature implements com.mouse.jwt.verifiable.domain.Signatu
     @Override
     public boolean verify(Token token) throws SignatureException {
         verifier.update(token.getSignContent().getBytes(StandardCharsets.UTF_8));
-        return verifier.verify(Base64.getDecoder().decode(token.getSignature()));
+        return verifier.verify(Serializer.getInstance().base64Decode(token.getSignature()));
     }
 }

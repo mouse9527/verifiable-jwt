@@ -7,15 +7,15 @@ public abstract class Serializer {
         Serializer.instance = serializer;
     }
 
-    static Serializer getInstance() {
+    public static Serializer getInstance() {
         return instance;
     }
 
-    protected abstract String base64Encode(byte[] src);
+    public abstract String base64Encode(byte[] src);
 
-    protected abstract byte[] base64Decode(byte[] base64);
+    public abstract byte[] base64Decode(String base64);
 
-    protected abstract <T> T readValueFromBase64(String base64, Class<T> clazz);
+    public abstract <T> T readValueFromBase64(String base64, Class<T> clazz);
 
-    protected abstract String writeValueToBase64(Object src);
+    public abstract String writeValueToBase64(Object src);
 }

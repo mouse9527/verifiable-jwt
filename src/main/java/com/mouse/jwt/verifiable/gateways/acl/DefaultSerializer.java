@@ -22,17 +22,17 @@ public class DefaultSerializer extends Serializer {
     }
 
     @Override
-    protected String base64Encode(byte[] src) {
+    public String base64Encode(byte[] src) {
         return encoder.encodeToString(src);
     }
 
     @Override
-    protected byte[] base64Decode(byte[] base64) {
+    public byte[] base64Decode(String base64) {
         return decoder.decode(base64);
     }
 
     @Override
-    protected <T> T readValueFromBase64(String base64, Class<T> clazz) {
+    public <T> T readValueFromBase64(String base64, Class<T> clazz) {
         try {
             return objectMapper.readValue(decoder.decode(base64), clazz);
         } catch (IOException e) {
@@ -41,7 +41,7 @@ public class DefaultSerializer extends Serializer {
     }
 
     @Override
-    protected String writeValueToBase64(Object src) {
+    public String writeValueToBase64(Object src) {
         try {
             return base64Encode(objectMapper.writeValueAsBytes(src));
         } catch (JsonProcessingException e) {

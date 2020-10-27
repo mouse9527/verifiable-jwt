@@ -21,13 +21,13 @@ public class Token {
         if (jwt == null || jwt.isEmpty()) {
             throw supplier.get();
         }
-        String[] split = jwt.split("\\.");
-        if (split.length != 3) {
+        String[] parts = jwt.split("\\.");
+        if (parts.length != 3) {
             throw supplier.get();
         }
-        this.headerString = split[0];
-        this.payloadString = split[1];
-        this.signature = split[2];
+        this.headerString = parts[0];
+        this.payloadString = parts[1];
+        this.signature = parts[2];
     }
 
     public void sign(byte[] signature) {

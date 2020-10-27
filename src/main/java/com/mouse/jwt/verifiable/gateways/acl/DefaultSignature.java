@@ -26,10 +26,9 @@ public class DefaultSignature implements com.mouse.jwt.verifiable.domain.Signatu
     }
 
     @Override
-    public boolean verify(String jwtToken) throws InvalidKeyException, SignatureException {
-        String[] split = jwtToken.split("\\.");
-        this.signature.initVerify(keyPair.getPublic());
-        this.signature.update(String.format("%s.%s", split[0], split[1]).getBytes(StandardCharsets.UTF_8));
-        return this.signature.verify(Base64.getDecoder().decode(split[2]));
+    public boolean verify(Token token) throws InvalidKeyException, SignatureException {
+        signature.initVerify(keyPair.getPublic());
+        signature.update(token.getSignContent().getBytes(StandardCharsets.UTF_8));
+        return signature.verify(Base64.getDecoder().decode(token.getSignature()));
     }
 }

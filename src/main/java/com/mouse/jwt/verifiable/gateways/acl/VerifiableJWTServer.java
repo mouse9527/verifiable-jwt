@@ -25,6 +25,7 @@ public class VerifiableJWTServer implements JWTServer {
 
     @Override
     public boolean verify(String tokenString) throws SignatureException, InvalidKeyException {
-        return signature.verify(tokenString);
+        Token token = new Token(tokenString);
+        return signature.verify(token);
     }
 }

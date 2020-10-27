@@ -6,5 +6,5 @@ import java.security.SignatureException;
 public interface Signature {
     void sign(Token token) throws SignatureException, InvalidKeyException;
 
-    boolean verify(String jwtToken) throws InvalidKeyException, SignatureException;
+    boolean verify(Token token) throws InvalidKeyException, SignatureException;
 }

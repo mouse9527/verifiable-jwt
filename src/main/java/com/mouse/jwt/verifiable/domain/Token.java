@@ -9,8 +9,8 @@ public class Token<HEADER, PAYLOAD> {
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final HEADER header;
-    private final String headerString;
     private final PAYLOAD payload;
+    private final String headerString;
     private final String payloadString;
     private String signature;
 

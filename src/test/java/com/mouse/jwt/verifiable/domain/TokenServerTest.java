@@ -16,13 +16,13 @@ import java.util.Base64;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TokenServerTest {
-    private JWTServer<TestPayload> jwtServer;
+    private JWTServer jwtServer;
 
     @BeforeEach
     void setUp() throws NoSuchAlgorithmException, InvalidKeySpecException {
         KeyPariProperties keyPari = new MockKeyPairProperties();
         Signature signature = new RS256Signature(keyPari);
-        jwtServer = new VerifiableJWTServer<>(signature);
+        jwtServer = new VerifiableJWTServer(signature);
     }
 
     @Test
@@ -31,10 +31,11 @@ public class TokenServerTest {
 
         Token<Header, Payload> token = jwtServer.sign(raw);
 
-        String jwtString = token.toString();
-        assertThat(jwtString).isNotEmpty();
-        assertThat(jwtString.split("\\.")).hasSize(3);
-        String payload = new String(Base64.getDecoder().decode(jwtString.split("\\.")[1]));
+        String jwtToken = token.toString();
+        System.out.println(jwtToken);
+        assertThat(jwtToken).isNotEmpty();
+        assertThat(jwtToken.split("\\.")).hasSize(3);
+        String payload = new String(Base64.getDecoder().decode(jwtToken.split("\\.")[1]));
         assertThat(JsonPath.compile("$.id").<String>read(payload)).isEqualTo("mock-token-id");
         assertThat(JsonPath.compile("$.type").<String>read(payload)).isEqualTo("user");
         assertThat(JsonPath.compile("$.iat").<String>read(payload)).isNotEmpty();

@@ -5,7 +5,7 @@ import com.mouse.jwt.verifiable.domain.*;
 import java.security.InvalidKeyException;
 import java.security.SignatureException;
 
-public class VerifiableJWTServer<P extends Payload> implements JWTServer<P> {
+public class VerifiableJWTServer implements JWTServer {
 
     private final Signature signature;
 
@@ -14,7 +14,7 @@ public class VerifiableJWTServer<P extends Payload> implements JWTServer<P> {
     }
 
     @Override
-    public Token<Header, Payload> sign(P payload) throws SignatureException, InvalidKeyException {
+    public Token<Header, Payload> sign(Payload payload) throws SignatureException, InvalidKeyException {
         Token<Header, Payload> token = new Token<>(RSAHeader.DEFAULT, payload);
         signature.sign(token);
         return token;

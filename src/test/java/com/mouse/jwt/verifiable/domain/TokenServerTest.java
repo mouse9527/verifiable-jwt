@@ -11,16 +11,22 @@ import org.junit.jupiter.api.Test;
 import java.security.*;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TokenServerTest {
+    private static final Instant IAT = Instant.parse("2020-10-27T00:00:00Z");
+    private static final Instant EXP = Instant.parse("2020-10-28T00:00:00Z");
     private JWTServer jwtServer;
+    private DefaultPayload raw;
 
     @BeforeEach
     void setUp() throws InvalidKeyException, NoSuchAlgorithmException {
         jwtServer = new VerifiableJWTServer(createSignature());
         Serializer.resetSerializer(new DefaultSerializer());
+        raw = new DefaultPayload("mock-token-id", "user", IAT, EXP);
     }
 
     private Signature createSignature() throws NoSuchAlgorithmException, InvalidKeyException {
@@ -32,8 +38,6 @@ public class TokenServerTest {
 
     @Test
     void shouldBeAbleToSignToJWT() throws SignatureException, InvalidKeyException {
-        DefaultPayload raw = new DefaultPayload("mock-token-id", "user", Instant.parse("2020-10-27T00:00:00Z"), Instant.parse("2020-10-28T00:00:00Z"));
-
         Token token = jwtServer.sign(raw);
 
         String jwtToken = token.toString();
@@ -57,4 +61,37 @@ public class TokenServerTest {
         assertThat(jwtServer.verify(new Token(jwtToken.replace("A", "B")))).isFalse();
     }
 
+
+    @Test
+    void shouldBeAbleToAsyncSign() throws InterruptedException, SignatureException, InvalidKeyException {
+        Map<Payload, Token> tokens = new ConcurrentHashMap<>();
+        for (int i = 0; i < 100; i++) {
+            new Thread(new Job(new DefaultPayload(String.valueOf(i), String.valueOf(i), IAT, EXP), tokens)).start();
+        }
+
+        Thread.sleep(2000);
+        for (Token token : tokens.values()) {
+            assertThat(jwtServer.verify(token)).isTrue();
+        }
+    }
+
+    class Job implements Runnable {
+        private final Payload payload;
+        private final Map<Payload, Token> tokens;
+
+        Job(Payload payload, Map<Payload, Token> tokens) {
+            this.payload = payload;
+            this.tokens = tokens;
+        }
+
+        @Override
+        public void run() {
+            try {
+                Token token = jwtServer.sign(payload);
+                tokens.put(payload, token);
+            } catch (SignatureException | InvalidKeyException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

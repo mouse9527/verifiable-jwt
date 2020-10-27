@@ -19,13 +19,17 @@ public class DefaultSignature implements com.mouse.jwt.verifiable.domain.Signatu
 
     @Override
     public void sign(Token token) throws SignatureException {
-        signer.update(token.getSignContent().getBytes(StandardCharsets.UTF_8));
-        token.sign(signer.sign());
+        synchronized (signer) {
+            signer.update(token.getSignContent().getBytes(StandardCharsets.UTF_8));
+            token.sign(signer.sign());
+        }
     }
 
     @Override
     public boolean verify(Token token) throws SignatureException {
-        verifier.update(token.getSignContent().getBytes(StandardCharsets.UTF_8));
-        return verifier.verify(Serializer.getInstance().base64Decode(token.getSignature()));
+        synchronized (verifier) {
+            verifier.update(token.getSignContent().getBytes(StandardCharsets.UTF_8));
+            return verifier.verify(Serializer.getInstance().base64Decode(token.getSignature()));
+        }
     }
 }

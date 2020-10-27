@@ -1,5 +1,7 @@
 package com.mouse.jwt.verifiable.domain;
 
+import java.util.function.Supplier;
+
 public class Token {
     private final String headerString;
     private final String payloadString;
@@ -14,8 +16,15 @@ public class Token {
         this.payloadString = toBase64String(payload);
     }
 
-    public Token(String jwtToken) {
-        String[] split = jwtToken.split("\\.");
+    public Token(String jwt) {
+        Supplier<IllegalJWTTokenException> supplier = () -> new IllegalJWTTokenException("Illegal JWT");
+        if (jwt == null || jwt.isEmpty()) {
+            throw supplier.get();
+        }
+        String[] split = jwt.split("\\.");
+        if (split.length != 3) {
+            throw supplier.get();
+        }
         this.headerString = split[0];
         this.payloadString = split[1];
         this.signature = split[2];

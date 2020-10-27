@@ -1,7 +1,7 @@
 package com.mouse.jwt.verifiable.domain;
 
-public interface JWTServer {
-    Token sign(Payload payload);
+public interface JWTSignature {
+    void sign(Token token);
 
     boolean verify(Token token);
 }

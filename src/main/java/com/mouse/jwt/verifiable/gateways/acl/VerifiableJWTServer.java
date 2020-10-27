@@ -2,28 +2,25 @@ package com.mouse.jwt.verifiable.gateways.acl;
 
 import com.mouse.jwt.verifiable.domain.JWTServer;
 import com.mouse.jwt.verifiable.domain.Payload;
-import com.mouse.jwt.verifiable.domain.Signature;
+import com.mouse.jwt.verifiable.domain.JWTSignature;
 import com.mouse.jwt.verifiable.domain.Token;
 
-import java.security.InvalidKeyException;
-import java.security.SignatureException;
-
 public class VerifiableJWTServer implements JWTServer {
-    private final Signature signature;
+    private final JWTSignature JWTSignature;
 
-    public VerifiableJWTServer(Signature signature) {
-        this.signature = signature;
+    public VerifiableJWTServer(JWTSignature JWTSignature) {
+        this.JWTSignature = JWTSignature;
     }
 
     @Override
-    public Token sign(Payload payload) throws SignatureException, InvalidKeyException {
+    public Token sign(Payload payload) {
         Token token = new Token(DefaultHeader.RS512, payload);
-        signature.sign(token);
+        JWTSignature.sign(token);
         return token;
     }
 
     @Override
-    public boolean verify(Token token) throws SignatureException, InvalidKeyException {
-        return signature.verify(token);
+    public boolean verify(Token token) {
+        return JWTSignature.verify(token);
     }
 }

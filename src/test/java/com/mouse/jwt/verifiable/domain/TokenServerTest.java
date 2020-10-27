@@ -1,14 +1,17 @@
 package com.mouse.jwt.verifiable.domain;
 
 import com.jayway.jsonpath.JsonPath;
+import com.mouse.jwt.verifiable.gateways.acl.DefaultJWTSignature;
 import com.mouse.jwt.verifiable.gateways.acl.DefaultPayload;
 import com.mouse.jwt.verifiable.gateways.acl.DefaultSerializer;
-import com.mouse.jwt.verifiable.gateways.acl.DefaultSignature;
 import com.mouse.jwt.verifiable.gateways.acl.VerifiableJWTServer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,15 +31,15 @@ public class TokenServerTest {
         raw = new DefaultPayload("mock-token-id", "user", IAT, EXP);
     }
 
-    private Signature createSignature() throws NoSuchAlgorithmException, InvalidKeyException {
+    private JWTSignature createSignature() throws NoSuchAlgorithmException, InvalidKeyException {
         KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
         generator.initialize(2048);
         KeyPair keyPair = generator.genKeyPair();
-        return new DefaultSignature(keyPair, "SHA1withRSA");
+        return new DefaultJWTSignature(keyPair, "SHA1withRSA");
     }
 
     @Test
-    void shouldBeAbleToSignToJWT() throws SignatureException, InvalidKeyException {
+    void shouldBeAbleToSignToJWT() {
         Token token = jwtServer.sign(raw);
 
         String jwtToken = token.toString();
@@ -51,7 +54,7 @@ public class TokenServerTest {
     }
 
     @Test
-    void shouldBeAbleToVerifiableJWT() throws SignatureException, InvalidKeyException {
+    void shouldBeAbleToVerifiableJWT() {
         DefaultPayload payload = new DefaultPayload();
         Token token = jwtServer.sign(payload);
 
@@ -68,12 +71,8 @@ public class TokenServerTest {
             int num = 0;
             while (true) {
                 num++;
-                try {
-                    Token token = jwtServer.sign(new DefaultPayload(String.valueOf(num), String.valueOf(num), IAT, EXP));
-                    tokens.add(token);
-                } catch (SignatureException | InvalidKeyException e) {
-                    e.printStackTrace();
-                }
+                Token token = jwtServer.sign(new DefaultPayload(String.valueOf(num), String.valueOf(num), IAT, EXP));
+                tokens.add(token);
             }
         });
         thread.start();
@@ -83,13 +82,8 @@ public class TokenServerTest {
         List<Token> verified = Collections.synchronizedList(new ArrayList<>());
         Thread verify = new Thread(() -> {
             for (Token token : tokens) {
-                try {
-                    jwtServer.verify(token);
-                    verified.add(token);
-                } catch (SignatureException | InvalidKeyException e) {
-                    e.printStackTrace();
-                }
-
+                jwtServer.verify(token);
+                verified.add(token);
             }
         });
         verify.start();
@@ -100,7 +94,7 @@ public class TokenServerTest {
     }
 
     @Test
-    void shouldBeAbleToAsyncSign() throws InterruptedException, SignatureException, InvalidKeyException {
+    void shouldBeAbleToAsyncSign() throws InterruptedException {
         Map<Payload, Token> tokens = new ConcurrentHashMap<>();
         for (int i = 0; i < 100; i++) {
             DefaultPayload payload = new DefaultPayload(String.valueOf(i), String.valueOf(i), IAT, EXP);
@@ -124,12 +118,8 @@ public class TokenServerTest {
 
         @Override
         public void run() {
-            try {
-                Token token = jwtServer.sign(payload);
-                tokens.put(payload, token);
-            } catch (SignatureException | InvalidKeyException e) {
-                e.printStackTrace();
-            }
+            Token token = jwtServer.sign(payload);
+            tokens.put(payload, token);
         }
     }
 }

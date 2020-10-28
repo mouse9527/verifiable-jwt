@@ -63,4 +63,8 @@ public class Token {
     public String getSignature() {
         return signature;
     }
+
+    public void sign(String signature) {
+        this.signature = signature;
+    }
 }

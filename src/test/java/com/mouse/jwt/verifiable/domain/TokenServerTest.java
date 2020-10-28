@@ -1,7 +1,6 @@
 package com.mouse.jwt.verifiable.domain;
 
 import com.jayway.jsonpath.JsonPath;
-import com.mouse.jwt.verifiable.gateways.acl.AsymmetricSignature;
 import com.mouse.jwt.verifiable.gateways.acl.DefaultPayload;
 import com.mouse.jwt.verifiable.gateways.acl.DefaultSerializer;
 import com.mouse.jwt.verifiable.gateways.acl.SymmetricSignature;
@@ -9,11 +8,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.*;
+import java.util.Base64;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,70 +66,6 @@ public class TokenServerTest {
         String jwtToken = token.toString();
         assertThat(jwtServer.verify(new Token(jwtToken))).isTrue();
         assertThat(jwtServer.verify(new Token(jwtToken.replace("A", "B")))).isFalse();
-    }
-
-    @Test
-    @SuppressWarnings("deprecation")
-    void symmetricPerformanceTest() throws InterruptedException {
-        List<Token> tokens = Collections.synchronizedList(new ArrayList<>());
-        Thread thread = new Thread(() -> {
-            int num = 0;
-            while (true) {
-                num++;
-                Token token = jwtServer.sign(new DefaultPayload(String.valueOf(num), String.valueOf(num), IAT, EXP));
-                tokens.add(token);
-            }
-        });
-        thread.start();
-        Thread.sleep(10000);
-        thread.stop();
-
-        List<Token> verified = Collections.synchronizedList(new ArrayList<>());
-        Thread verify = new Thread(() -> {
-            for (Token token : tokens) {
-                jwtServer.verify(token);
-                verified.add(token);
-            }
-        });
-        verify.start();
-        Thread.sleep(200);
-        verify.stop();
-
-        System.out.printf("Sign: %s per/sec%nVerify: %s per/sec%n", tokens.size() / 10, verified.size() * 5);
-    }
-
-    @SuppressWarnings("deprecation")
-    @Test
-    void asymmetricPerformanceTest() throws InterruptedException, NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException {
-        KeyGenerator generator = KeyGenerator.getInstance("AES");
-        generator.init(256);
-        Key key = generator.generateKey();
-        JWTServer jwtServer = new JWTServer(new AsymmetricSignature(key, "AES"));
-        List<Token> tokens = Collections.synchronizedList(new ArrayList<>());
-        Thread thread = new Thread(() -> {
-            int num = 0;
-            while (true) {
-                num++;
-                Token token = jwtServer.sign(new DefaultPayload(String.valueOf(num), String.valueOf(num), IAT, EXP));
-                tokens.add(token);
-            }
-        });
-        thread.start();
-        Thread.sleep(10000);
-        thread.stop();
-
-        List<Token> verified = Collections.synchronizedList(new ArrayList<>());
-        Thread verify = new Thread(() -> {
-            for (Token token : tokens) {
-                jwtServer.verify(token);
-                verified.add(token);
-            }
-        });
-        verify.start();
-        Thread.sleep(200);
-        verify.stop();
-
-        System.out.printf("Sign: %s per/sec%nVerify: %s per/sec%n", tokens.size() / 10, verified.size() * 5);
     }
 
     @Test
